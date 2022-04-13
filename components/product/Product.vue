@@ -1,7 +1,7 @@
 <template>
   <div id="product">
     <div class="container px-5 py-6" id="featured-3">
-      <h2 class="pb-2 border-bottom">Columns with icons</h2>
+      <h2 class="pb-2 border-bottom">Our Products</h2>
       <div class="row g-3 py-3 row-cols-1 row-cols-lg-3">
         <div class="feature col card">
           <div class="feature-icon bg-gradient">

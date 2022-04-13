@@ -18,7 +18,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~/plugins/vue-js-modal.js', ssr: false }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -32,10 +32,26 @@ export default {
     'bootstrap-vue/nuxt',
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: 'AIzaSyDzWroEvVManWefsC_iS_q1RvaI_G3Fjbs',
+          authDomain: 'vue-shop-3434f.firebaseapp.com',
+          projectId: 'vue-shop-3434f',
+          storageBucket: 'vue-shop-3434f.appspot.com',
+          messagingSenderId: '1044068700834',
+          appId: '1:1044068700834:web:f55026774bf6d69f4cfdfb',
+          measurementId: 'G-W3NT9C9FYH',
+        },
+        services: {
+          auth: true,
+          firestore: true,
+          database: true,
+        },
+      },
+    ],
   ],
-
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
