@@ -10,7 +10,7 @@
           <b-form-input
             type="text"
             id="name"
-            v-model="name"
+            v-model="product.name"
             placeholder="Product Name"
           ></b-form-input>
         </div>
@@ -18,12 +18,12 @@
           <b-form-input
             type="text"
             id="price"
-            v-model="price"
+            v-model="product.price"
             placeholder="Price"
           ></b-form-input>
         </div>
         <div class="form-group">
-          <b-button @click="saveData" class="btn-primary">Save Data</b-button>
+          <b-button @click="saveData" variant="primary">Save Data</b-button>
         </div>
       </b-form>
     </div>
@@ -42,10 +42,12 @@
             <td>{{ product.data().name }}</td>
             <td>{{ product.data().price }}</td>
             <td>
-              <button class="btn btn-primary" @click="showModal">Edit</button>
-              <button class="btn btn-danger" @click="deleteData(product.id)">
+              <b-button variant="primary" @click="editProduct(product)"
+                >Edit</b-button
+              >
+              <b-button variant="danger" @click="deleteData(product.id)">
                 Delete
-              </button>
+              </b-button>
             </td>
           </tr>
         </tbody>
@@ -54,7 +56,7 @@
     <modal
       name="edit-products-modal"
       :width="400"
-      :height="370"
+      :height="240"
       :adaptive="true"
     >
       <h2>Edit Product</h2>
@@ -63,6 +65,7 @@
           <input
             class="form-control"
             type="text"
+            v-modal="product.name"
             id="name"
             placeholder="Product Name"
           />
@@ -71,12 +74,12 @@
           <input
             class="form-control"
             type="text"
+            v-modal="product.price"
             id="price"
             placeholder="Price"
           />
         </div>
-        <button @click="hideModal" class="btn btn-primary">Close Modal</button>
-        <button @click="saveData" class="btn btn-primary">Save Data</button>
+        <b-button @click="updateProduct()" variant="primary">Save Data</b-button>
       </form>
     </modal>
   </div>
@@ -88,65 +91,87 @@ export default {
 
   data() {
     return {
-      name: '',
-      price: '',
+      product: {
+        name: '',
+        price: '',
+      },
       products: [],
+      activItem: '',
     }
   },
   methods: {
-    saveData() {
+    saveData () {
       this.$fire.firestore
         .collection('Products')
-        .add({
-          name: this.name,
-          price: this.price,
-        })
+        .add(this.product)
         .then(() => {
-          this.reset()
+          this.product = {
+            name: '',
+            price: '',
+          }
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(err => {
+          console.log(err)
         })
-    },
-    reset() {
-      this.name = ''
-      this.price = ''
     },
 
-    getData() {
+    getData () {
       this.$fire.firestore
         .collection('Products')
         .get()
-        .then((querySnapshot) => {
-          this.products = []
-          querySnapshot.forEach((doc) => {
+        .then(snapshot => {
+          snapshot.forEach(doc => {
             this.products.push(doc)
           })
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(err => {
+          console.log(err)
         })
     },
-    deleteData(id) {
+    deleteData (id) {
       this.$fire.firestore
         .collection('Products')
         .doc(id)
         .delete()
         .then(() => {
           alert('Data Deleted')
+          this.products = []
           this.getData()
         })
-        .catch((error) => {
-          console.log(error)
+        .catch(err => {
+          console.log(err)
         })
     },
-    showModal() {
+    editProduct (product) {
+      this.activItem = product.id
+      this.product = product.data()
       this.$modal.show('edit-products-modal')
     },
-    hideModal() {
-      this.$modal.hide('edit-products-modal')
-    },
   },
+  updateProduct() {
+    this.$fire.firestore
+      .collection('Products')
+      .doc(this.activItem.id)
+      .update(this.product)
+      .then(() => {
+        this.$modal.hide('edit-products-modal')
+        this.watcher()
+      }) 
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+  watcher(){
+    this.$fire.firestore
+      .collection('Products')
+      .onSnapshot((querySnapshot) => {
+        this.products = []
+        querySnapshot.forEach((doc) => {
+          this.products.push(doc)
+        })
+      })
+  },
+
   created() {
     this.getData()
   },

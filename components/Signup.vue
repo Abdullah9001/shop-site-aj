@@ -55,6 +55,21 @@ export default {
         .createUserWithEmailAndPassword(this.email, this.password)
         .then((user) => {
           this.$router.replace({ path : '/admin' })
+          this.$fire.firestore
+            .collection('profile')
+            .doc(user.user.uid)
+            .set({
+              name: this.name,
+              email: this.email,
+            })
+            .then(() => {
+              this.name = ''
+              this.email = ''
+              this.password = ''
+            })
+            .catch(err => {
+              console.log(err)
+            })
         })
         .catch((error) => {
           console.log(error)
